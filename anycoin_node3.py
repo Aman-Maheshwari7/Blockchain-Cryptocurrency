@@ -20,7 +20,7 @@ class Blockchain:
         self.transactions=[]
         self.create_block(proof=1,previous_hash='0') #Genesis block
         self.nodes=set()
-        
+        self.orphaned_transactions=[]
         
         
     def create_block(self,proof,previous_hash):
@@ -84,14 +84,36 @@ class Blockchain:
         network=self.nodes
         longest_chain=None
         max_l=len(self.chain)
+        flag1=False
+        flag2=False
         for nodes in network:
             response=requests.get("http://{}/get_chain".format(nodes))
             if(response.status_code==200):
                 length=response.json()['length']
                 chain=response.json()['chain']
+                
+                
                 if(length>max_l and self.is_chain_valid(chain)):
                     max_l=length
                     longest_chain=chain
+                    flag1=True
+                
+                if(flag1==True and flag2==False):    
+                    for i in self.orphaned_transactions:
+                        self.transactions.append(i)
+                    self.orphaned_transactions=[]
+                    
+                #Handling the orphaned Block case to keep the fund transfers safe
+                if(len(self.chain)==max_l):
+                    last_block=self.chain[-1]
+                    last_block_other=chain[-1]
+                    if(last_block['transaction']!=last_block_other['transaction']):
+                        for i in last_block['transaction']:
+                            self.orphaned_transactions.append(i)
+                            flag2=True
+            
+        if(flag1==False and flag2==False):
+            self.orphaned_transactions=[]
         if longest_chain:
             self.chain=longest_chain
             return True
@@ -126,7 +148,7 @@ def mine_block():
               'timestamp':block['timestamp'],
               'proof':block['proof'],
               'previous_hash':block['previous_hash'],
-              'transaction': block['transactions']}
+              'transaction': block['transaction']}
     
     return jsonify(response),200 
 
@@ -136,6 +158,11 @@ def mine_block():
 def get_chain():
     response={'chain': blockchain.chain,
               'length': len(blockchain.chain)}
+    return jsonify(response),200
+
+@app.route('/get_connected_nodes', methods=['GET'])
+def get_connected_nodes():
+    response={'nodes': blockchain.nodes}
     return jsonify(response),200
 
 

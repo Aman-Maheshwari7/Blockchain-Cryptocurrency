@@ -1,4 +1,5 @@
 # BFS starts from "start"
+# Functionality for non-directly connected node
 import requests
 def BFS(self,start):
     q=[]

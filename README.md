@@ -19,7 +19,7 @@ Use add_transaction function to add transactions and mine_block function to mine
 
 "Postman" can be used to "get" and "put" to api.
 
-Orphaned-block problem is carefully handled so that no loss of transaction history takes place even in the blockchain
+Orphaned-block problem is carefully handled so that no loss of transaction history takes place ever in the blockchain
 
 
 

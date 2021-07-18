@@ -21,6 +21,10 @@ Use add_transaction function to add transactions and mine_block function to mine
 
 Orphaned-block problem is carefully handled so that no loss of transaction history takes place ever in the blockchain
 
+# Important features yet to be added
+1) Increasing the difficulty level once a certain percentage of total blocks are mined
+2) Increasing the number of transactions per block with the increase in difficulty in mining
+
 
 
 
